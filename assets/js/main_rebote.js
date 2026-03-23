@@ -1,125 +1,75 @@
-const canvas = document.getElementById("canvas");
-let ctx = canvas.getContext("2d");
+let circles3 = [];
 
-//Dimensiones
-const window_height = window.innerHeight / 2;
-const window_width = window.innerWidth / 2;
+function initRebote(N) {
+    const canvas = document.getElementById("canvas3");
+    const ctx = canvas.getContext("2d");
 
-canvas.height = window_height;
-canvas.width = window_width;
+    canvas.width = 300;
+    canvas.height = 200;
 
-canvas.style.background = "#ff8";
+    circles3 = [];
 
-class Circle {
-
-    constructor(x, y, radius, color, text, speed) {
-        this.posX = x;
-        this.posY = y;
-        this.radius = radius;
-        this.baseColor = color;
-        this.color = color;
-        this.text = text;
-        this.speed = speed;
-
-        this.dx = (Math.random() - 0.5) * this.speed * 2;
-        this.dy = (Math.random() - 0.5) * this.speed * 2;
+    for (let i = 0; i < N; i++) {
+        circles3.push({
+            x: Math.random()*300,
+            y: Math.random()*200,
+            r: 15,
+            dx: (Math.random()-0.5)*4,
+            dy: (Math.random()-0.5)*4,
+            color: "lime"
+        });
     }
 
-    draw(context) {
-        context.beginPath();
+    function animate() {
+        ctx.clearRect(0,0,300,200);
 
-        // 🔹 RELLENO (fondo del círculo)
-        context.fillStyle = this.color;
-        context.arc(this.posX, this.posY, this.radius, 0, Math.PI * 2, false);
-        context.fill();
+        circles3.forEach(c=>{
+            c.x += c.dx;
+            c.y += c.dy;
 
-        // 🔹 BORDE
-        context.strokeStyle = "black";
-        context.lineWidth = 2;
-        context.stroke();
+            if(c.x<0||c.x>300) c.dx*=-1;
+            if(c.y<0||c.y>200) c.dy*=-1;
 
-        // 🔹 TEXTO
-        context.fillStyle = "black";
-        context.textAlign = "center";
-        context.textBaseline = "middle";
-        context.font = "20px Arial";
-        context.fillText(this.text, this.posX, this.posY);
+            c.color="lime";
+        });
 
-        context.closePath();
-    }
+        // colisiones con rebote
+        for (let i=0;i<circles3.length;i++){
+            for (let j=i+1;j<circles3.length;j++){
 
-    update(context) {
-        this.draw(context);
+                let dx = circles3[j].x - circles3[i].x;
+                let dy = circles3[j].y - circles3[i].y;
+                let dist = Math.sqrt(dx*dx+dy*dy);
 
-        // Rebote con paredes
-        if ((this.posX + this.radius) > window_width || (this.posX - this.radius) < 0) {
-            this.dx = -this.dx;
-        }
+                if(dist < circles3[i].r + circles3[j].r){
 
-        if ((this.posY + this.radius) > window_height || (this.posY - this.radius) < 0) {
-            this.dy = -this.dy;
-        }
+                    // intercambio de velocidades
+                    let tempDx = circles3[i].dx;
+                    let tempDy = circles3[i].dy;
 
-        this.posX += this.dx;
-        this.posY += this.dy;
-    }
-}
+                    circles3[i].dx = circles3[j].dx;
+                    circles3[i].dy = circles3[j].dy;
 
-// 🔹 Crear N círculos
-let circles = [];
-let N = 10;
+                    circles3[j].dx = tempDx;
+                    circles3[j].dy = tempDy;
 
-for (let i = 0; i < N; i++) {
-    let radius = Math.floor(Math.random() * 40 + 20);
-    let x = Math.random() * (window_width - 2 * radius) + radius;
-    let y = Math.random() * (window_height - 2 * radius) + radius;
-
-    circles.push(new Circle(x, y, radius, "blue", i + 1, 3));
-}
-
-// 🔹 Función para color aleatorio
-function colorAleatorio() {
-    return `hsl(${Math.random() * 360}, 100%, 50%)`;
-}
-
-// 🔹 Colisiones con rebote
-function detectarColisiones() {
-    for (let i = 0; i < circles.length; i++) {
-        for (let j = i + 1; j < circles.length; j++) {
-
-            let dx = circles[j].posX - circles[i].posX;
-            let dy = circles[j].posY - circles[i].posY;
-
-            let distancia = Math.sqrt(dx * dx + dy * dy);
-
-            if (distancia <= circles[i].radius + circles[j].radius) {
-
-                // 🔥 CAMBIO DE COLOR
-                circles[i].color = colorAleatorio();
-                circles[j].color = colorAleatorio();
-
-                // 🔥 REBOTE (intercambio de velocidades)
-                let tempDx = circles[i].dx;
-                let tempDy = circles[i].dy;
-
-                circles[i].dx = circles[j].dx;
-                circles[i].dy = circles[j].dy;
-
-                circles[j].dx = tempDx;
-                circles[j].dy = tempDy;
+                    circles3[i].color="orange";
+                    circles3[j].color="orange";
+                }
             }
         }
+
+        circles3.forEach(c=>{
+            ctx.beginPath();
+            ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
+            ctx.fillStyle=c.color;
+            ctx.fill();
+        });
+
+        requestAnimationFrame(animate);
     }
+
+    animate();
 }
 
-let updateCircle = function () {
-    requestAnimationFrame(updateCircle);
-
-    ctx.clearRect(0, 0, window_width, window_height);
-
-    circles.forEach(circle => circle.update(ctx));
-
-    detectarColisiones();
-};
-
-updateCircle();
+initRebote(10);

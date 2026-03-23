@@ -2,12 +2,73 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demo colision 2D</title>
+    <title>Simulador de Círculos</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
-    <canvas id="canvas"></canvas>
 
-    <script src="assets/js/main_rebote.js"></script>
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <span class="navbar-brand">Simulación de Círculos</span>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <!-- Slider -->
+    <div class="mb-4">
+        <label class="form-label">Cantidad de círculos: <span id="valor">10</span></label>
+        <input type="range" class="form-range" min="1" max="30" value="10" id="slider">
+    </div>
+
+    <div class="row text-center">
+
+        <div class="col-md-4">
+            <h5>Movimiento</h5>
+            <canvas id="canvas1"></canvas>
+        </div>
+
+        <div class="col-md-4">
+            <h5>Colisión</h5>
+            <canvas id="canvas2"></canvas>
+        </div>
+
+        <div class="col-md-4">
+            <h5>Rebote</h5>
+            <canvas id="canvas3"></canvas>
+        </div>
+
+    </div>
+
+</div>
+
+<footer class="bg-dark text-white text-center mt-4 p-3">
+    Roman Resendiz Vargas
+</footer>
+
+<script src="assets/js/main_movimiento.js"></script>
+<script src="assets/js/main_colision.js"></script>
+<script src="assets/js/main_rebote.js"></script>
+
+<script>
+const slider = document.getElementById("slider");
+const valor = document.getElementById("valor");
+
+valor.textContent = slider.value;
+
+slider.addEventListener("input", () => {
+    valor.textContent = slider.value;
+
+    initMovimiento(slider.value);
+    initColision(slider.value);
+    initRebote(slider.value);
+});
+</script>
+
 </body>
 </html>
