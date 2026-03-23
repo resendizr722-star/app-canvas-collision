@@ -16,8 +16,8 @@ class Circle {
         this.posX = x;
         this.posY = y;
         this.radius = radius;
+        this.baseColor = color;
         this.color = color;
-        this.originalColor = color;
         this.text = text;
         this.speed = speed;
 
@@ -27,21 +27,31 @@ class Circle {
 
     draw(context) {
         context.beginPath();
-        context.strokeStyle = this.color;
+
+        // 🔹 RELLENO (fondo del círculo)
+        context.fillStyle = this.color;
+        context.arc(this.posX, this.posY, this.radius, 0, Math.PI * 2, false);
+        context.fill();
+
+        // 🔹 BORDE
+        context.strokeStyle = "black";
+        context.lineWidth = 2;
+        context.stroke();
+
+        // 🔹 TEXTO
+        context.fillStyle = "black";
         context.textAlign = "center";
         context.textBaseline = "middle";
         context.font = "20px Arial";
         context.fillText(this.text, this.posX, this.posY);
 
-        context.lineWidth = 2;
-        context.arc(this.posX, this.posY, this.radius, 0, Math.PI * 2, false);
-        context.stroke();
         context.closePath();
     }
 
     update(context) {
+        this.draw(context);
 
-        //Rebote con paredes
+        // Rebote con paredes
         if ((this.posX + this.radius) > window_width || (this.posX - this.radius) < 0) {
             this.dx = -this.dx;
         }
@@ -52,56 +62,64 @@ class Circle {
 
         this.posX += this.dx;
         this.posY += this.dy;
-
-        this.draw(context);
     }
 }
 
-// 🔴 FUNCIÓN DE COLISIÓN
-function detectarColision(c1, c2) {
-    let dx = c1.posX - c2.posX;
-    let dy = c1.posY - c2.posY;
-    let distancia = Math.sqrt(dx * dx + dy * dy);
-
-    return distancia < (c1.radius + c2.radius);
-}
-
-// 🔵 CREAR N CÍRCULOS
-let numCirculos = 10;
+// 🔹 Crear N círculos
 let circles = [];
+let N = 10;
 
-for (let i = 0; i < numCirculos; i++) {
-    let radius = Math.floor(Math.random() * 40) + 20;
+for (let i = 0; i < N; i++) {
+    let radius = Math.floor(Math.random() * 40 + 20);
+    let x = Math.random() * (window_width - 2 * radius) + radius;
+    let y = Math.random() * (window_height - 2 * radius) + radius;
 
-    let x = Math.random() * (window_width - radius * 2) + radius;
-    let y = Math.random() * (window_height - radius * 2) + radius;
-
-    let circle = new Circle(x, y, radius, "blue", i + 1, 3);
-    circles.push(circle);
+    circles.push(new Circle(x, y, radius, "blue", i + 1, 3));
 }
 
-// 🔁 ANIMACIÓN
-function updateCircle() {
-    requestAnimationFrame(updateCircle);
-    ctx.clearRect(0, 0, window_width, window_height);
+// 🔹 Función para color aleatorio
+function colorAleatorio() {
+    return `hsl(${Math.random() * 360}, 100%, 50%)`;
+}
 
-    // Resetear colores
-    circles.forEach(c => c.color = c.originalColor);
-
-    // Detectar colisiones ENTRE TODOS
+// 🔹 Colisiones con rebote
+function detectarColisiones() {
     for (let i = 0; i < circles.length; i++) {
         for (let j = i + 1; j < circles.length; j++) {
 
-            if (detectarColision(circles[i], circles[j])) {
-                circles[i].color = "red";
-                circles[j].color = "red";
-            }
+            let dx = circles[j].posX - circles[i].posX;
+            let dy = circles[j].posY - circles[i].posY;
 
+            let distancia = Math.sqrt(dx * dx + dy * dy);
+
+            if (distancia <= circles[i].radius + circles[j].radius) {
+
+                // 🔥 CAMBIO DE COLOR
+                circles[i].color = colorAleatorio();
+                circles[j].color = colorAleatorio();
+
+                // 🔥 REBOTE (intercambio de velocidades)
+                let tempDx = circles[i].dx;
+                let tempDy = circles[i].dy;
+
+                circles[i].dx = circles[j].dx;
+                circles[i].dy = circles[j].dy;
+
+                circles[j].dx = tempDx;
+                circles[j].dy = tempDy;
+            }
         }
     }
-
-    // Actualizar todos
-    circles.forEach(c => c.update(ctx));
 }
+
+let updateCircle = function () {
+    requestAnimationFrame(updateCircle);
+
+    ctx.clearRect(0, 0, window_width, window_height);
+
+    circles.forEach(circle => circle.update(ctx));
+
+    detectarColisiones();
+};
 
 updateCircle();
