@@ -1,4 +1,42 @@
 let circles2 = [];
+let animation2;
+
+function randomColor() {
+    return `hsl(${Math.random()*360}, 80%, 60%)`;
+}
+
+class CircleCollision {
+    constructor(x, y, r) {
+        this.x = x;
+        this.y = y;
+        this.r = r;
+
+        let angle = Math.random() * Math.PI * 2;
+        let speed = 2;
+
+        this.dx = Math.cos(angle) * speed;
+        this.dy = Math.sin(angle) * speed;
+
+        this.color = randomColor();
+    }
+
+    draw(ctx) {
+        ctx.beginPath();
+        ctx.fillStyle = this.color;
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    update(ctx, w, h) {
+        if (this.x + this.r >= w || this.x - this.r <= 0) this.dx *= -1;
+        if (this.y + this.r >= h || this.y - this.r <= 0) this.dy *= -1;
+
+        this.x += this.dx;
+        this.y += this.dy;
+
+        this.draw(ctx);
+    }
+}
 
 function initColision(N) {
     const canvas = document.getElementById("canvas2");
@@ -7,54 +45,40 @@ function initColision(N) {
     canvas.width = 300;
     canvas.height = 200;
 
+    cancelAnimationFrame(animation2);
     circles2 = [];
 
     for (let i = 0; i < N; i++) {
-        circles2.push({
-            x: Math.random()*300,
-            y: Math.random()*200,
-            r: 15,
-            dx: 2,
-            dy: 2,
-            color: "yellow"
-        });
+        let r = Math.random() * 15 + 10;
+        let x = Math.random() * (canvas.width - 2 * r) + r;
+        let y = Math.random() * (canvas.height - 2 * r) + r;
+
+        circles2.push(new CircleCollision(x, y, r));
     }
 
-    function animate() {
-        ctx.clearRect(0,0,300,200);
+    function detectar() {
+        for (let i = 0; i < circles2.length; i++) {
+            for (let j = i + 1; j < circles2.length; j++) {
 
-        circles2.forEach(c => {
-            c.x += c.dx;
-            c.y += c.dy;
-
-            if (c.x < 0 || c.x > 300) c.dx *= -1;
-            if (c.y < 0 || c.y > 200) c.dy *= -1;
-
-            c.color = "yellow";
-        });
-
-        // detectar colisiones
-        for (let i=0;i<circles2.length;i++){
-            for (let j=i+1;j<circles2.length;j++){
                 let dx = circles2[i].x - circles2[j].x;
                 let dy = circles2[i].y - circles2[j].y;
-                let dist = Math.sqrt(dx*dx+dy*dy);
+                let dist = Math.sqrt(dx * dx + dy * dy);
 
-                if(dist < circles2[i].r + circles2[j].r){
-                    circles2[i].color="red";
-                    circles2[j].color="red";
+                if (dist < circles2[i].r + circles2[j].r) {
+                    circles2[i].color = randomColor();
+                    circles2[j].color = randomColor();
                 }
             }
         }
+    }
 
-        circles2.forEach(c=>{
-            ctx.beginPath();
-            ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
-            ctx.fillStyle=c.color;
-            ctx.fill();
-        });
+    function animate() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
 
-        requestAnimationFrame(animate);
+        circles2.forEach(c => c.update(ctx, canvas.width, canvas.height));
+        detectar();
+
+        animation2 = requestAnimationFrame(animate);
     }
 
     animate();
