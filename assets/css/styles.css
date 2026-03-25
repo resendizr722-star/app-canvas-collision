@@ -1,8 +1,21 @@
 body {
-    background: linear-gradient(135deg, #1f1f2e, #3a3a5a);
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+
+    /* 🔥 Fondo moderno tipo gradiente animado */
+    background: linear-gradient(135deg, #1e1e2f, #2c3e50, #4b6cb7);
+    background-size: 300% 300%;
+    animation: fondoAnimado 10s ease infinite;
+
     color: white;
 }
 
+/* 🔥 Animación del fondo */
+@keyframes fondoAnimado {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
 /* Base canvas */
 canvas {
     width: 100%;
@@ -27,4 +40,77 @@ canvas {
 #canvas3 {
     background: radial-gradient(circle, #000000, #020024, #090979);
     border: 1px solid rgba(0,255,150,0.4);
+}
+footer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+/* 🔥 caja interna del footer */
+.footer-box {
+    width: 90%;
+    max-width: 900px;
+
+    padding: 25px;
+
+    /* 🔥 nuevo color más acorde */
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+
+    border-radius: 20px;
+
+    backdrop-filter: blur(10px);
+
+    /* borde más sutil */
+    border: 1px solid rgba(0,255,255,0.15);
+
+    /* sombra elegante */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+
+    text-align: center;
+    color: #e0f7ff;
+}
+
+/* texto */
+.footer-box p {
+    margin: 6px 0;
+    font-size: 16px;
+}
+
+/* título destacado */
+.footer-box strong {
+    color: #00eaff;
+}
+/* NAVBAR BASE */
+.custom-navbar {
+    background: linear-gradient(135deg, #141e30, #243b55);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    padding: 15px 0;
+}
+
+/* 🔥 TÍTULO */
+.custom-title {
+    font-size: 28px;
+    font-weight: bold;
+
+    /* estilo moderno */
+    letter-spacing: 1px;
+
+    /* gradiente en texto */
+    background: linear-gradient(90deg, #00f5ff, #00ffcc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    /* glow */
+    text-shadow: 0 0 10px rgba(0,255,255,0.5);
+
+    transition: 0.3s;
+}
+
+/* efecto hover */
+.custom-title:hover {
+    text-shadow: 
+        0 0 15px #00f5ff,
+        0 0 30px #00ffcc;
 }
